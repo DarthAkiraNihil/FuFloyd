@@ -1,3 +1,4 @@
+#include <cctype>
 #include <memory.h>
 #include <ctime>
 #include <cstring>
@@ -177,6 +178,45 @@ void inputMatrix() {
     delete [] adjacencyMatrix;
 }
 
+void loadMatrixFromFile() {
+    DrawMainFrame;
+
+    int pointsCount = 0;
+    char graphFileName[255];
+    float** adjacencyMatrix;
+    gotoxy(4, 4); printf("ֲגוהטעו טלÿ פאיכא דנאפא: ");
+    fgets(graphFileName, 255, stdin);
+    graphFileName[strlen(graphFileName) - 1] = 0;
+    FILE* graphFile = fopen(graphFileName, "r");
+    if (graphFile != nullptr) {
+        fscanf(graphFile, "%d", &pointsCount);
+        adjacencyMatrix = new float* [pointsCount];
+        for (int i = 0; i < pointsCount; i++) {
+            adjacencyMatrix[i] = new float [pointsCount];
+        }
+        char line[512]; line[0] = 0;
+        fgets(line, 512, graphFile);
+        for (int i = 0; i < pointsCount; i++) {
+            int index = 0;
+            fgets(line, 512, graphFile);
+            char * tokenPointer = strtok(line, " ");
+            while (tokenPointer != nullptr) {
+                adjacencyMatrix[i][index++] = (float) atof(tokenPointer);
+                //puts(tokenPointer);
+                tokenPointer = strtok(nullptr, " ");
+            }
+            //puts(line);
+        }
+        printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 15);
+        for (int i = 0; i < pointsCount; i++) delete [] adjacencyMatrix[i];
+        delete [] adjacencyMatrix;
+        getchar(); getchar();
+
+    }
+
+
+}
+
 int main() {
     setWindowSize(WINDOW_SIZE_WIDTH, WINDOW_SIZE_HEIGHT);
     hideCursor();
@@ -196,6 +236,7 @@ int main() {
                 break;
             }
             case 2: {
+                loadMatrixFromFile();
                 break;
             }
             case 3: {
