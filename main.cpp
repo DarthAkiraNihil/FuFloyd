@@ -1,4 +1,6 @@
 #include <memory.h>
+#include <ctime>
+#include <cstring>
 #include <cstdio>
 #include "conio21/conio2.h"
 #include "appconsts.h"
@@ -60,6 +62,52 @@ void makeNullMatrix(float** graph, int pointsCount) {
     }
 }
 
+void printAdjacencyMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
+    for (int i = 0; i < pointsCount; i++) {
+        for (int j = 0; j < pointsCount; j++) {
+            gotoxy(ltcX + j * 7, ltcY + i);
+            if (graph[i][j] == INFINITY) {
+                printf("[ INF ]");
+            }
+            else if (graph[i][j] == MAIN_DIAG_MARK) {
+                printf("[  X  ]");
+            }
+            else {
+                printf("[%5.2f]", graph[i][j]);
+                /*printf("[");
+                printf("%5.2f", graph[i][j]);
+                gotoxy(ltcX + j * 7 + 6, ltcY + i); printf("]");*/
+            }
+        }
+    }
+}
+
+void writeAdjacencyMatrixToFile(float** graph, int pointsCount) {
+    time_t sc = time(nullptr);
+    char outputFile[255]; sprintf(outputFile, "graph-%lld", (long long) sc);
+    outputFile[strlen(outputFile)] = 0;
+    FILE* out = fopen(outputFile, "w+");
+    for (int i = 0; i < pointsCount; i++) {
+        for (int j = 0; j < pointsCount; j++) {
+            //gotoxy(ltcX + j * 7, ltcY + i);
+            if (graph[i][j] == INFINITY) {
+                fprintf(out, "[ INF ]");
+            }
+            else if (graph[i][j] == MAIN_DIAG_MARK) {
+                fprintf(out, "[  X  ]");
+            }
+            else {
+                fprintf(out, "[%5.2f]", graph[i][j]);
+                /*printf("[");
+                printf("%5.2f", graph[i][j]);
+                gotoxy(ltcX + j * 7 + 6, ltcY + i); printf("]");*/
+            }
+        }
+        fprintf(out, "\n");
+    }
+    fclose(out);
+}
+
 void inputMatrix() {
     //makeNullMatrix(graph, pointsCount);
     DrawMainFrame;
@@ -69,10 +117,10 @@ void inputMatrix() {
         gotoxy(4, 4); printf("Введите количество вершин в графе (маск. 8): ");
         scanf("%d", &pointsCount);
         if (pointsCount < 1 || pointsCount > 8) {
-            printf("Неверно введено количество вершин графа.\n");
-            printf("Пожалуйста, попробуйте ещё раз.\n");
-            printf("Нажмите любую клавишу для продолжения");
-            getchar();
+            gotoxy(4, 5); printf("Неверно введено количество вершин графа.\n");
+            gotoxy(4, 6); printf("Пожалуйста, попробуйте ещё раз.\n");
+            gotoxy(4, 7); printf("Нажмите любую клавишу для продолжения");
+            getchar(); getchar();
             gotoxy(4, 5); PrintNullLine;
             gotoxy(4, 6); PrintNullLine;
             gotoxy(4, 7); PrintNullLine;
@@ -102,7 +150,28 @@ void inputMatrix() {
             gotoxy(4, 6 + j); PrintNullLine;
         }
     }
-    printf("%.2f", adjacencyMatrix[0][1]);
+    gotoxy(4, 5); printf("Матрица смежности графа успешно заполнена.    "); getchar();
+    bool stepByStep = false; int outputMode;
+    gotoxy(4, 6); printf("Куда вывести итоговую матрицу?");
+    do {
+        gotoxy(4, 7); printf("1 - в файл (повышенная точность вывода), 2 - в консоли: ");
+        scanf("%d", &outputMode);
+        if (outputMode != 1 && outputMode != 2) {
+
+            gotoxy(4, 8); printf("Неверно введён режим вывода\n");
+            gotoxy(4, 9); printf("Пожалуйста, попробуйте ещё раз.\n");
+            gotoxy(4, 10); printf("Нажмите любую клавишу для продолжения");
+            getchar(); getchar();
+            gotoxy(4, 8); PrintNullLine;
+            gotoxy(4, 9); PrintNullLine;
+            gotoxy(4, 10); PrintNullLine;
+        }
+    } while (outputMode != 1 && outputMode != 2);
+    //printf("%.2f", adjacencyMatrix[0][1]);
+    floydAlgorithm(adjacencyMatrix, pointsCount);
+    printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 10);
+    writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount);
+    //getchar(); getchar();
 
     for (int i = 0; i < pointsCount; i++) delete [] adjacencyMatrix[i];
     delete [] adjacencyMatrix;
