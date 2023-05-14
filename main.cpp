@@ -85,20 +85,20 @@ void printAdjacencyMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
 
 void writeAdjacencyMatrixToFile(float** graph, int pointsCount) {
     time_t sc = time(nullptr);
-    char outputFile[255]; sprintf(outputFile, "graph-%lld", (long long) sc);
+    char outputFile[255]; sprintf(outputFile, "graph-%lld.txt", (long long) sc);
     outputFile[strlen(outputFile)] = 0;
     FILE* out = fopen(outputFile, "w+");
     for (int i = 0; i < pointsCount; i++) {
         for (int j = 0; j < pointsCount; j++) {
             //gotoxy(ltcX + j * 7, ltcY + i);
             if (graph[i][j] == INFINITY) {
-                fprintf(out, "[ INF ]");
+                fprintf(out, "[   INF   ]");
             }
             else if (graph[i][j] == MAIN_DIAG_MARK) {
-                fprintf(out, "[  X  ]");
+                fprintf(out, "[    X    ]");
             }
             else {
-                fprintf(out, "[%5.2f]", graph[i][j]);
+                fprintf(out, "[%9.4f]", graph[i][j]);
                 /*printf("[");
                 printf("%5.2f", graph[i][j]);
                 gotoxy(ltcX + j * 7 + 6, ltcY + i); printf("]");*/
@@ -170,8 +170,20 @@ void inputMatrix() {
     } while (outputMode != 1 && outputMode != 2);
     //printf("%.2f", adjacencyMatrix[0][1]);
     floydAlgorithm(adjacencyMatrix, pointsCount);
-    printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 10);
-    writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount);
+    switch (outputMode) {
+        case 1: {
+            writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount);
+            break;
+        }
+        case 2: {
+            printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 10);
+            break;
+        }
+    }
+    getchar();
+
+
+
     //getchar(); getchar();
 
     for (int i = 0; i < pointsCount; i++) delete [] adjacencyMatrix[i];
@@ -207,10 +219,12 @@ void loadMatrixFromFile() {
             }
             //puts(line);
         }
-        printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 15);
+        floydAlgorithm(adjacencyMatrix, pointsCount);
+        writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount);
+        //printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 15);
         for (int i = 0; i < pointsCount; i++) delete [] adjacencyMatrix[i];
         delete [] adjacencyMatrix;
-        getchar(); getchar();
+        //getchar(); getchar();
 
     }
 
