@@ -64,9 +64,6 @@ void printAdjacencyMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
             }
             else {
                 printf("[%5.2f]", graph[i][j]);
-                /*printf("[");
-                printf("%5.2f", graph[i][j]);
-                gotoxy(ltcX + j * 7 + 6, ltcY + i); printf("]");*/
             }
         }
     }
@@ -276,7 +273,7 @@ int main() {
                 break;
             }
             case 3: {
-
+                DrawMainFrame;
                 break;
             }
             default: {
