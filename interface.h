@@ -7,6 +7,13 @@
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
 
+const char CP866_FRAME_HORIZONTAL = 0xCD;
+const char CP886_FRAME_VERTICAL = 0xBA;
+const char CP886_FRAME_CORNER_LEFT_TOP = 0xC9;
+const char CP886_FRAME_CORNER_LEFT_BOTTOM = 0xC8;
+const char CP886_FRAME_CORNER_RIGHT_TOP = 0xBB;
+const char CP886_FRAME_CORNER_RIGHT_BOTTOM = 0xBC;
+
 
 
 void waitForKey(int code) {
@@ -35,19 +42,21 @@ void drawFrame(int width, int height, int drawX, int drawY) {
     char* topBorder = new char[width + 1];
     char* bottomBorder = new char[width + 1];
     char* rlBorder = new char[width + 1];
-    topBorder[0] = '#'; bottomBorder[0] = '#'; rlBorder[0] = '|';
-    topBorder[width - 1] = '#'; bottomBorder[width - 1] = '#'; rlBorder[width - 1] = '|';
+    topBorder[0] = CP886_FRAME_CORNER_LEFT_TOP; bottomBorder[0] = CP886_FRAME_CORNER_LEFT_BOTTOM; rlBorder[0] = CP886_FRAME_VERTICAL;
+    topBorder[width - 1] = CP886_FRAME_CORNER_RIGHT_TOP; bottomBorder[width - 1] = CP886_FRAME_CORNER_RIGHT_BOTTOM; rlBorder[width - 1] = CP886_FRAME_VERTICAL;
     topBorder[width] = 0; bottomBorder[width] = 0; rlBorder[width] = 0;
     for (int i = 1; i < width - 1; i++) {
-        topBorder[i] = '='; bottomBorder[i] = '='; rlBorder[i] = ' ';
+        topBorder[i] = CP866_FRAME_HORIZONTAL; bottomBorder[i] = CP866_FRAME_HORIZONTAL; rlBorder[i] = ' ';
     }
-    cprintf(topBorder);
+    setCP(866);
+    printf(topBorder);
     for (int i = 0; i < height - 2; i++) {
         gotoxy(drawX, drawY + i + 1);
-        cprintf(rlBorder);
+        printf(rlBorder);
     }
     gotoxy(drawX, drawY + height - 1);
-    cprintf(bottomBorder);
+    printf(bottomBorder);
+    setCP(1251);
 }
 
 
@@ -61,28 +70,12 @@ int drawMenu(
         int alignCenterV,
         short activePointColor
 ) {
-    int key;//??
+    int key;
     gotoxy(drawX, drawY);
     int maxLen = -1;
     for (int i = 0; i < pointsCount; i++) maxLen = max(maxLen, (int) strlen(menuPoints[i]));
-    char* topBorder = new char[maxLen + alignCenterH*2 + 3];
-    char* bottomBorder = new char[maxLen + alignCenterH*2 + 3];
-    char* rlBorder = new char[maxLen + alignCenterH*2 + 3];
-    topBorder[0] = 0xc9; bottomBorder[0] = '='; rlBorder[0] = '|';
-    topBorder[maxLen + alignCenterH*2 + 1] = '#'; bottomBorder[maxLen + alignCenterH*2 + 1] = '#'; rlBorder[maxLen + alignCenterH*2 + 1] = '|';
-    topBorder[maxLen + alignCenterH*2 + 2] = 0; bottomBorder[maxLen + alignCenterH*2 + 2] = 0; rlBorder[maxLen + alignCenterH*2 + 2] = 0;
-    for (int i = 1; i < maxLen + alignCenterH*2 + 1; i++) {
-        topBorder[i] = '='; bottomBorder[i] = '='; rlBorder[i] = ' ';
-    }
-    setCP(866);
-    printf(topBorder);
-    for (int i = 0; i < pointsCount + alignCenterV * 2; i++) {
-        gotoxy(drawX, drawY + i + 1);
-        printf(rlBorder);
-    }
-    gotoxy(drawX, drawY + pointsCount + alignCenterV * 2 + 1);
-    printf(bottomBorder);
-    setCP(1251);
+
+    drawFrame(maxLen + alignCenterH*2 + 2, pointsCount + alignCenterV * 2 + 2, drawX, drawY);
     for (int i = 0; i < pointsCount; i++) {
         gotoxy(drawX + alignCenterH + 1, drawY + alignCenterV + 1 + i);
         printf(menuPoints[i]);
