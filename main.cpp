@@ -90,6 +90,9 @@ void writeAdjacencyMatrixToFile(float** graph, int pointsCount, FILE* file, bool
 }
 
 int main() {
+    char title[255];
+    sprintf(title, "FuFloyd v. %s", VERSION);
+    title[strlen(title)] = 0;
     setWindowSize(WINDOW_SIZE_WIDTH, WINDOW_SIZE_HEIGHT);
     hideCursor();
     drawFrame(78, 30, 2, 2);
@@ -98,7 +101,9 @@ int main() {
     int choice = 1;
     do {
         DrawMainFrame;
-        choice = drawMenu(choice, mainMenu, 4, 5, 12, 4, 2, 1);
+        drawFrame(20, 3, 30, 6);
+        gotoxy(32, 7); printf(title);
+        choice = drawMenu(choice, mainMenu, 4, 13, 12, 4, 2, 1);
         switch (choice) {
             case 1: {
                 DrawMainFrame;
