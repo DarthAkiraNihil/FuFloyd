@@ -114,8 +114,8 @@ int main() {
                     if (pointsCount < 1 || pointsCount > 8) {
                         gotoxy(4, 5); printf("Неверно введено количество вершин графа.\n");
                         gotoxy(4, 6); printf("Пожалуйста, попробуйте ещё раз.\n");
-                        gotoxy(4, 7); printf("Нажмите любую клавишу для продолжения");
-                        getchar(); getchar();
+                        gotoxy(4, 7); printf("Нажмите Enter для продолжения");
+                        waitForKey(13);
                         gotoxy(4, 5); PrintNullLine;
                         gotoxy(4, 6); PrintNullLine;
                         gotoxy(4, 7); PrintNullLine;
@@ -153,9 +153,8 @@ int main() {
                     if (outputMode != 1 && outputMode != 2) {
                         gotoxy(4, 8); printf("Неверно введён режим вывода\n");
                         gotoxy(4, 9); printf("Пожалуйста, попробуйте ещё раз.\n");
-                        gotoxy(4, 10); printf("Нажмите любую клавишу для продолжения");
+                        gotoxy(4, 10); printf("Нажмите Enter для продолжения");
                         waitForKey(13);
-                        //getchar(); getchar();
                         gotoxy(4, 8); PrintNullLine;
                         gotoxy(4, 9); PrintNullLine;
                         gotoxy(4, 10); PrintNullLine;
@@ -174,7 +173,7 @@ int main() {
                         floydAlgorithm(adjacencyMatrix, pointsCount);
                         writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount, out, true);
                         gotoxy(4, 6); printf("Матрица Флойда записана в файл %s", outputFile);
-                        gotoxy(4, 7); printf("Нажмите любую клавишу для продолжения");
+                        gotoxy(4, 7); printf("Нажмите Enter для продолжения");
                         waitForKey(13);
                         fclose(out);
                         break;
@@ -187,7 +186,7 @@ int main() {
                             if (stepByStep != 1 && stepByStep != 0) {
                                 gotoxy(4, 7); printf("Неверно введён режим отображения выполнения\n");
                                 gotoxy(4, 8); printf("Пожалуйста, попробуйте ещё раз.\n");
-                                gotoxy(4, 9); printf("Нажмите любую клавишу для продолжения");
+                                gotoxy(4, 9); printf("Нажмите Enter для продолжения");
                                 waitForKey(13);
                                 gotoxy(4, 7); PrintNullLine;
                                 gotoxy(4, 8); PrintNullLine;
