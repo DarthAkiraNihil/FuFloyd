@@ -279,6 +279,17 @@ int main() {
             }
             case 3: {
                 DrawMainFrame;
+                gotoxy(4, 4); printf(title);
+                gotoxy(4, 6); printf("Автор: Егор \"TheSwagVader\" Зверев");
+                gotoxy(4, 7); printf("Репозиторий проекта: github.com/TheSwagVader/FuFloyd");
+
+                gotoxy(4, 9); printf("Поиск кратчайших путей в графе с помощью Алгоритма Флойда");
+                gotoxy(4, 10); printf("Может обрабатывать матрицы, введённые в программе, и из файлов");
+
+                gotoxy(4, 12); printf("Проект лицензирован на основе Apache 2.0. License");
+                gotoxy(4, 15); printf("Нажмите Enter для продолжения");
+                waitForKey(13);
+
                 break;
             }
             default: {
