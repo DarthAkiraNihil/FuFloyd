@@ -110,7 +110,11 @@ int main() {
                 int pointsCount = 0;
                 do {
                     gotoxy(4, 4); printf("Введите количество вершин в графе (маск. 8): ");
-                    scanf("%d", &pointsCount);
+                    char rawPoints[4];
+                    fgets(rawPoints, 4, stdin);
+                    pointsCount = strtol(rawPoints, nullptr, 10);
+                    fflush(stdin);
+                    //scanf("%d", &pointsCount);
                     if (pointsCount < 1 || pointsCount > 8) {
                         gotoxy(4, 5); printf("Неверно введено количество вершин графа.\n");
                         gotoxy(4, 6); printf("Пожалуйста, попробуйте ещё раз.\n");
@@ -137,19 +141,47 @@ int main() {
                             adjacencyMatrix[i][j] = MAIN_DIAG_MARK;
                         }
                         else {
-                            scanf("%f", &adjacencyMatrix[i][j]);
+                            do {
+                                char rawWeight[16];
+                                fgets(rawWeight, 16, stdin);
+                                fflush(stdin);
+                                if (rawWeight[0] == '0') {
+                                    adjacencyMatrix[i][j] = 0;
+                                    break;
+                                }
+                                else {
+                                    adjacencyMatrix[i][j] = strtod(rawWeight, nullptr);
+                                    if (adjacencyMatrix[i][j] == 0) {
+                                        gotoxy(4, 7 + j); printf("Неверно введён вес ребра графа.\n");
+                                        gotoxy(4, 8 + j); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                        gotoxy(4, 9 + j); printf("Нажмите Enter для продолжения");
+                                        waitForKey(13);
+                                        gotoxy(4, 7 + j); PrintNullLine;
+                                        gotoxy(4, 8 + j); PrintNullLine;
+                                        gotoxy(4, 9 + j); PrintNullLine;
+                                        gotoxy(4, 6 + j); PrintNullLine;
+                                        gotoxy(4, 6 + j);
+                                        printf("Введите элемент V[%d][%d]: ", i + 1, j + 1);
+                                    }
+                                    else break;
+                                }
+                            } while (true);
+                            //scanf("%f", &adjacencyMatrix[i][j]);
                         }
                     }
                     for (int j = 0; j < pointsCount; j++) {
                         gotoxy(4, 6 + j); PrintNullLine;
                     }
                 }
-                gotoxy(4, 5); printf("Весовая матрица графа успешно заполнена.    "); getchar();
+                gotoxy(4, 5); printf("Весовая матрица графа успешно заполнена.    ");// getchar();
                 int outputMode;
                 gotoxy(4, 6); printf("Куда вывести итоговую матрицу?");
                 do {
                     gotoxy(4, 7); printf("1 - в файл (повышенная точность вывода), 2 - в консоли: ");
-                    scanf("%d", &outputMode);
+                    char rawOutputMode[3]; fgets(rawOutputMode, 3, stdin);
+                    outputMode = strtol(rawOutputMode, nullptr, 10);
+                    fflush(stdin);
+                    //scanf("%d", &outputMode);
                     if (outputMode != 1 && outputMode != 2) {
                         gotoxy(4, 8); printf("Неверно введён режим вывода\n");
                         gotoxy(4, 9); printf("Пожалуйста, попробуйте ещё раз.\n");
@@ -182,8 +214,13 @@ int main() {
                         int stepByStep;
                         do {
                             gotoxy(4, 6); printf("Выполнять алгоритм пошагово? (1 - да, 0 - нет) ");
-                            scanf("%d", &stepByStep);
-                            if (stepByStep != 1 && stepByStep != 0) {
+                            char rawStepByStep[3];
+                            fgets(rawStepByStep, 3, stdin);
+                            fflush(stdin);
+                            if (rawStepByStep[0] == '0') stepByStep = 2;
+                            else stepByStep = strtol(rawStepByStep, nullptr, 10);
+                            //scanf("%d", &stepByStep);
+                            if (stepByStep != 1 && stepByStep != 2) {
                                 gotoxy(4, 7); printf("Неверно введён режим отображения выполнения\n");
                                 gotoxy(4, 8); printf("Пожалуйста, попробуйте ещё раз.\n");
                                 gotoxy(4, 9); printf("Нажмите Enter для продолжения");
@@ -194,7 +231,7 @@ int main() {
                                 gotoxy(4, 6); PrintNullLine;
                             }
                             gotoxy(4, 6); PrintNullLine;
-                        } while(stepByStep != 1 && stepByStep != 0);
+                        } while(stepByStep != 1 && stepByStep != 2);
                         switch (stepByStep) {
                             case 1: {
                                 prepareMatrix(adjacencyMatrix, pointsCount);
@@ -211,7 +248,7 @@ int main() {
                                 waitForKey(13);
                                 break;
                             }
-                            case 0: {
+                            case 2: {
                                 floydAlgorithm(adjacencyMatrix, pointsCount);
                                 gotoxy(4, 7); printf("Матрица, после выполнения алгоритма Флойда:");
                                 printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 9);

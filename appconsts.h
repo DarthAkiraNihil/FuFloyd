@@ -15,6 +15,6 @@ char* mainMenu[50] = {
     "Выйти из программы"
 };
 
-const char VERSION[5] = "b0.9";
+const char VERSION[6] = "b0.95";
 
 #endif //FLOYDALGORITHM_APPCONSTS_H
