@@ -52,7 +52,7 @@ void floydAlgorithm(float** graph, int pointsCount) {
     }
 }
 
-void printAdjacencyMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
+void printMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
     for (int i = 0; i < pointsCount; i++) {
         for (int j = 0; j < pointsCount; j++) {
             gotoxy(ltcX + j * 7, ltcY + i);
@@ -69,7 +69,7 @@ void printAdjacencyMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
     }
 }
 
-void writeAdjacencyMatrixToFile(float** graph, int pointsCount, FILE* file, bool afterFloyd = false) {
+void writeMatrixToFile(float** graph, int pointsCount, FILE* file, bool afterFloyd = false) {
     fprintf(file, (afterFloyd) ? "Матрица, после применения алгоритма Флойда\n" : "Весовая матрица введённого графа:\n");
     for (int i = 0; i < pointsCount; i++) {
         for (int j = 0; j < pointsCount; j++) {
@@ -97,7 +97,7 @@ int main() {
     hideCursor();
     drawFrame(78, 30, 2, 2);
     setCP(1251);
-    float** adjacencyMatrix;
+    float** weightMatrix;
     int choice = 1;
     do {
         DrawMainFrame;
@@ -126,9 +126,9 @@ int main() {
                         gotoxy(4, 4); PrintNullLine;
                     }
                 } while (pointsCount < 1 || pointsCount > 8);
-                adjacencyMatrix = new float* [pointsCount];
+                weightMatrix = new float* [pointsCount];
                 for (int i = 0; i < pointsCount; i++) {
-                    adjacencyMatrix[i] = new float [pointsCount];
+                    weightMatrix[i] = new float [pointsCount];
                 }
                 gotoxy(4, 5); printf("Переходим к заполнению весовой матрицы графа");
                 for (int i = 0; i < pointsCount; i++) {
@@ -138,7 +138,7 @@ int main() {
                         //gotoxy(29, 6 + j);
                         if (i == j) {
                             printf("[ЭЛЕМЕНТ ГЛАВНОЙ ДИАГОНАЛИ]");
-                            adjacencyMatrix[i][j] = MAIN_DIAG_MARK;
+                            weightMatrix[i][j] = MAIN_DIAG_MARK;
                         }
                         else {
                             do {
@@ -146,12 +146,12 @@ int main() {
                                 fgets(rawWeight, 16, stdin);
                                 fflush(stdin);
                                 if (rawWeight[0] == '0') {
-                                    adjacencyMatrix[i][j] = 0;
+                                    weightMatrix[i][j] = 0;
                                     break;
                                 }
                                 else {
-                                    adjacencyMatrix[i][j] = strtod(rawWeight, nullptr);
-                                    if (adjacencyMatrix[i][j] == 0) {
+                                    weightMatrix[i][j] = strtod(rawWeight, nullptr);
+                                    if (weightMatrix[i][j] == 0) {
                                         gotoxy(4, 7 + j); printf("Неверно введён вес ребра графа.\n");
                                         gotoxy(4, 8 + j); printf("Пожалуйста, попробуйте ещё раз.\n");
                                         gotoxy(4, 9 + j); printf("Нажмите Enter для продолжения");
@@ -166,7 +166,7 @@ int main() {
                                     else break;
                                 }
                             } while (true);
-                            //scanf("%f", &adjacencyMatrix[i][j]);
+                            //scanf("%f", &weightMatrix[i][j]);
                         }
                     }
                     for (int j = 0; j < pointsCount; j++) {
@@ -201,9 +201,9 @@ int main() {
                         char outputFile[255]; sprintf(outputFile, "graph-%lld.txt", (long long) sc);
                         outputFile[strlen(outputFile)] = 0;
                         FILE* out = fopen(outputFile, "w+");
-                        writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount, out);
-                        floydAlgorithm(adjacencyMatrix, pointsCount);
-                        writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount, out, true);
+                        writeMatrixToFile(weightMatrix, pointsCount, out);
+                        floydAlgorithm(weightMatrix, pointsCount);
+                        writeMatrixToFile(weightMatrix, pointsCount, out, true);
                         gotoxy(4, 6); printf("Матрица Флойда записана в файл %s", outputFile);
                         gotoxy(4, 7); printf("Нажмите Enter для продолжения");
                         waitForKey(13);
@@ -234,12 +234,12 @@ int main() {
                         } while(stepByStep != 1 && stepByStep != 2);
                         switch (stepByStep) {
                             case 1: {
-                                prepareMatrix(adjacencyMatrix, pointsCount);
+                                prepareMatrix(weightMatrix, pointsCount);
                                 gotoxy(4, 6); printf("Выполнение алгоритма Флойда пошагово");
                                 for (int k = 0; k < pointsCount; k++) {
-                                    floydAlgorithmOneStep(adjacencyMatrix, pointsCount, k);
+                                    floydAlgorithmOneStep(weightMatrix, pointsCount, k);
                                     gotoxy(4, 7); printf("Итерация %d/%d", k + 1, pointsCount);
-                                    printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 9);
+                                    printMatrix(weightMatrix, pointsCount, 4, 9);
                                     gotoxy(4, 10 + pointsCount); printf("Enter = Следующая итерация");
                                     waitForKey(13);
                                 }
@@ -249,9 +249,9 @@ int main() {
                                 break;
                             }
                             case 2: {
-                                floydAlgorithm(adjacencyMatrix, pointsCount);
+                                floydAlgorithm(weightMatrix, pointsCount);
                                 gotoxy(4, 7); printf("Матрица, после выполнения алгоритма Флойда:");
-                                printAdjacencyMatrix(adjacencyMatrix, pointsCount, 4, 9);
+                                printMatrix(weightMatrix, pointsCount, 4, 9);
                                 gotoxy(4, 10 + pointsCount); printf("Нажмите Enter для продолжения");
                                 waitForKey(13);
                                 break;
@@ -260,8 +260,8 @@ int main() {
                         break;
                     }
                 }
-                for (int i = 0; i < pointsCount; i++) delete [] adjacencyMatrix[i];
-                delete [] adjacencyMatrix;
+                for (int i = 0; i < pointsCount; i++) delete [] weightMatrix[i];
+                delete [] weightMatrix;
                 break;
             }
             case 2: {
@@ -274,9 +274,9 @@ int main() {
                 FILE* graphFile = fopen(graphFileName, "r");
                 if (graphFile != nullptr) {
                     fscanf(graphFile, "%d", &pointsCount);
-                    adjacencyMatrix = new float* [pointsCount];
+                    weightMatrix = new float* [pointsCount];
                     for (int i = 0; i < pointsCount; i++) {
-                        adjacencyMatrix[i] = new float [pointsCount];
+                        weightMatrix[i] = new float [pointsCount];
                     }
                     char line[512]; line[0] = 0;
                     fgets(line, 512, graphFile);
@@ -285,7 +285,7 @@ int main() {
                         fgets(line, 512, graphFile);
                         char * tokenPointer = strtok(line, " ");
                         while (tokenPointer != nullptr) {
-                            adjacencyMatrix[i][index++] = (float) atof(tokenPointer);
+                            weightMatrix[i][index++] = (float) atof(tokenPointer);
                             tokenPointer = strtok(nullptr, " ");
                         }
                     }
@@ -295,16 +295,16 @@ int main() {
                     outputFile[strlen(outputFile)] = 0;
                     FILE* out = fopen(outputFile, "w+");
 
-                    writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount, out);
-                    floydAlgorithm(adjacencyMatrix, pointsCount);
-                    writeAdjacencyMatrixToFile(adjacencyMatrix, pointsCount, out, true);
+                    writeMatrixToFile(weightMatrix, pointsCount, out);
+                    floydAlgorithm(weightMatrix, pointsCount);
+                    writeMatrixToFile(weightMatrix, pointsCount, out, true);
                     gotoxy(4, 5); printf("Матрица Флойда записана в файл %s", outputFile);
                     gotoxy(4, 6); printf("Нажмите Enter для продолжения");
                     waitForKey(13);
                     fclose(out);
                     fclose(out);
-                    for (int i = 0; i < pointsCount; i++) delete [] adjacencyMatrix[i];
-                    delete [] adjacencyMatrix;
+                    for (int i = 0; i < pointsCount; i++) delete [] weightMatrix[i];
+                    delete [] weightMatrix;
                 }
                 else {
                     gotoxy(4, 5); printf("Такого файла не существует");
