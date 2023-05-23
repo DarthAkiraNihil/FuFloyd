@@ -12,7 +12,7 @@ const int MAIN_DIAG_MARK = -1000000;
 
 #define min(x, y) (x < y) ? x : y
 #define DrawMainFrame drawFrame(78, 30, 2, 2)
-#define PrintNullLine printf("                                                           ")
+#define PrintNullLine printf("                                                                          ")
 
 void prepareMatrix(float** graph, int pointsCount) {
     for (int i = 0; i < pointsCount; i++) {
@@ -70,6 +70,7 @@ void printMatrix(float** graph, int pointsCount, int ltcX, int ltcY) {
 }
 
 void writeMatrixToFile(float** graph, int pointsCount, FILE* file, bool afterFloyd = false) {
+    fflush(file);
     fprintf(file, (afterFloyd) ? "Матрица, после применения алгоритма Флойда\n" : "Весовая матрица введённого графа:\n");
     for (int i = 0; i < pointsCount; i++) {
         for (int j = 0; j < pointsCount; j++) {
@@ -205,9 +206,88 @@ int main() {
                         floydAlgorithm(weightMatrix, pointsCount);
                         writeMatrixToFile(weightMatrix, pointsCount, out, true);
                         gotoxy(4, 6); printf("Матрица Флойда записана в файл %s", outputFile);
-                        gotoxy(4, 7); printf("Нажмите Enter для продолжения");
-                        waitForKey(13);
-                        fclose(out);
+
+                        //gotoxy(4, 7); printf("1 - в файл (повышенная точность вывода), 2 - в консоли: ");
+                        int wish;
+                        do {
+                            gotoxy(4, 7); printf("Вы хотите узнать длину какого-нибудь кратчайшего пути? (1 - да; 0 - нет)");
+                            char rawWish[3];
+                            fgets(rawWish, 3, stdin);
+                            fflush(stdin);
+                            if (rawWish[0] == '0') wish = 2;
+                            else wish = strtol(rawWish, nullptr, 10);
+                            //scanf("%d", &stepByStep);
+                            if (wish != 1 && wish != 2) {
+                                gotoxy(4, 8); printf("Неверно введён параметр\n");
+                                gotoxy(4, 9); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                gotoxy(4, 10); printf("Нажмите Enter для продолжения");
+                                waitForKey(13);
+                                gotoxy(4, 8); PrintNullLine;
+                                gotoxy(4, 9); PrintNullLine;
+                                gotoxy(4, 10); PrintNullLine;
+                                gotoxy(4, 7); PrintNullLine;
+                            }
+                            //gotoxy(4, 6); PrintNullLine;
+                        } while(wish != 1 && wish != 2);
+                        gotoxy(4, 7); PrintNullLine;
+                        switch (wish) {
+                            case 1: {
+                                int source, destination;
+                                do {
+                                    gotoxy(4, 8); printf("Введите номер вершины начала пути:");
+                                    char rawSource[3];
+                                    fgets(rawSource, 3, stdin);
+                                    fflush(stdin);
+                                    source = strtol(rawSource, nullptr, 10);
+                                    //scanf("%d", &stepByStep);
+                                    if (source == 0 || source > pointsCount) {
+                                        gotoxy(4, 9); printf("Неверно введён номер вершины начала пути\n");
+                                        gotoxy(4, 10); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                        gotoxy(4, 11); printf("Нажмите Enter для продолжения");
+                                        waitForKey(13);
+                                        gotoxy(4, 9); PrintNullLine;
+                                        gotoxy(4, 10); PrintNullLine;
+                                        gotoxy(4, 11); PrintNullLine;
+                                        gotoxy(4, 8); PrintNullLine;
+                                    }
+                                    //gotoxy(4, 6); PrintNullLine;
+                                } while(source == 0 || source > pointsCount);
+                                do {
+                                    gotoxy(4, 9); printf("Введите номер вершины конца пути:");
+                                    char rawDest[3];
+                                    fgets(rawDest, 3, stdin);
+                                    fflush(stdin);
+                                    destination = strtol(rawDest, nullptr, 10);
+                                    //scanf("%d", &stepByStep);
+                                    if (destination == 0 || destination > pointsCount) {
+                                        gotoxy(4, 10); printf("Неверно введён номер вершины конца пути\n");
+                                        gotoxy(4, 11); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                        gotoxy(4, 12); printf("Нажмите Enter для продолжения");
+                                        waitForKey(13);
+                                        gotoxy(4, 10); PrintNullLine;
+                                        gotoxy(4, 11); PrintNullLine;
+                                        gotoxy(4, 12); PrintNullLine;
+                                        gotoxy(4, 9); PrintNullLine;
+                                    }
+                                    //gotoxy(4, 6); PrintNullLine;
+                                } while(destination == 0 || destination > pointsCount);
+                                float pathLen = weightMatrix[source-1][destination-1];
+                                gotoxy(4, 10);
+                                if (pathLen == MAIN_DIAG_MARK) {
+                                    printf("Вы выбрали элемент главной диагонали матрицы");
+                                }
+                                else if (pathLen == INFINITY) {
+                                    printf("Пути из вершины %d в вершину %d не существует", source, destination);
+                                }
+                                else {
+                                    printf("Длина кратчайшего пути из вершины %d в вершину %d равна %.2f", source, destination, pathLen);
+                                }
+
+                                gotoxy(4, 11); printf("Нажмите Enter для продолжения");
+                                waitForKey(13);
+                                break;
+                            }
+                        }
                         break;
                     }
                     case 2: {
@@ -257,6 +337,89 @@ int main() {
                                 break;
                             }
                         }
+                        int wish;
+                        do {
+                            gotoxy(4, 10 + pointsCount); printf("Вы хотите узнать длину какого-нибудь кратчайшего пути? (1 - да; 0 - нет)");
+                            char rawWish[3];
+                            fgets(rawWish, 3, stdin);
+                            fflush(stdin);
+                            if (rawWish[0] == '0') wish = 2;
+                            else wish = strtol(rawWish, nullptr, 10);
+                            //scanf("%d", &stepByStep);
+                            if (wish != 1 && wish != 2) {
+                                gotoxy(4, 11 + pointsCount); printf("Неверно введён параметр\n");
+                                gotoxy(4, 12 + pointsCount); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                gotoxy(4, 13 + pointsCount); printf("Нажмите Enter для продолжения");
+                                waitForKey(13);
+                                gotoxy(4, 11 + pointsCount); PrintNullLine;
+                                gotoxy(4, 12 + pointsCount); PrintNullLine;
+                                gotoxy(4, 13 + pointsCount); PrintNullLine;
+                                gotoxy(4, 10+ pointsCount); PrintNullLine;
+                            }
+                            //gotoxy(4, 6); PrintNullLine;
+                        } while(wish != 1 && wish != 2);
+                        gotoxy(4, 10 + pointsCount); PrintNullLine;
+                        switch (wish) {
+                            case 1: {
+                                for (int i = 6; i < 20; i++) {
+                                    gotoxy(4, i); PrintNullLine;
+                                }
+                                int source, destination;
+                                do {
+                                    gotoxy(4, 6); printf("Введите номер вершины начала пути:");
+                                    char rawSource[3];
+                                    fgets(rawSource, 3, stdin);
+                                    fflush(stdin);
+                                    source = strtol(rawSource, nullptr, 10);
+                                    //scanf("%d", &stepByStep);
+                                    if (source == 0 || source > pointsCount) {
+                                        gotoxy(4, 7); printf("Неверно введён номер вершины начала пути\n");
+                                        gotoxy(4, 8); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                        gotoxy(4, 9); printf("Нажмите Enter для продолжения");
+                                        waitForKey(13);
+                                        gotoxy(4, 7); PrintNullLine;
+                                        gotoxy(4, 8); PrintNullLine;
+                                        gotoxy(4, 9); PrintNullLine;
+                                        gotoxy(4, 6); PrintNullLine;
+                                    }
+                                    //gotoxy(4, 6); PrintNullLine;
+                                } while(source == 0 || source > pointsCount);
+                                do {
+                                    gotoxy(4, 7); printf("Введите номер вершины конца пути:");
+                                    char rawDest[3];
+                                    fgets(rawDest, 3, stdin);
+                                    fflush(stdin);
+                                    destination = strtol(rawDest, nullptr, 10);
+                                    //scanf("%d", &stepByStep);
+                                    if (destination == 0 || destination > pointsCount) {
+                                        gotoxy(4, 8); printf("Неверно введён номер вершины конца пути\n");
+                                        gotoxy(4, 9); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                        gotoxy(4, 10); printf("Нажмите Enter для продолжения");
+                                        waitForKey(13);
+                                        gotoxy(4, 8); PrintNullLine;
+                                        gotoxy(4, 9); PrintNullLine;
+                                        gotoxy(4, 10); PrintNullLine;
+                                        gotoxy(4, 7); PrintNullLine;
+                                    }
+                                    //gotoxy(4, 6); PrintNullLine;
+                                } while(destination == 0 || destination > pointsCount);
+                                float pathLen = weightMatrix[source-1][destination-1];
+                                gotoxy(4, 8);
+                                if (pathLen == MAIN_DIAG_MARK) {
+                                    printf("Вы выбрали элемент главной диагонали матрицы");
+                                }
+                                else if (pathLen == INFINITY) {
+                                    printf("Пути из вершины %d в вершину %d не существует", source, destination);
+                                }
+                                else {
+                                    printf("Длина кратчайшего пути из вершины %d в вершину %d равна %.2f", source, destination, pathLen);
+                                }
+
+                                gotoxy(4, 9); printf("Нажмите Enter для продолжения");
+                                waitForKey(13);
+                                break;
+                            }
+                        }
                         break;
                     }
                 }
@@ -298,11 +461,93 @@ int main() {
                     writeMatrixToFile(weightMatrix, pointsCount, out);
                     floydAlgorithm(weightMatrix, pointsCount);
                     writeMatrixToFile(weightMatrix, pointsCount, out, true);
+                    fclose(out);
                     gotoxy(4, 5); printf("Матрица Флойда записана в файл %s", outputFile);
                     gotoxy(4, 6); printf("Нажмите Enter для продолжения");
                     waitForKey(13);
-                    fclose(out);
-                    fclose(out);
+                    int wish;
+                    do {
+                        gotoxy(4, 7); printf("Вы хотите узнать длину какого-нибудь кратчайшего пути? (1 - да; 0 - нет)");
+                        char rawWish[3];
+                        fgets(rawWish, 3, stdin);
+                        fflush(stdin);
+                        if (rawWish[0] == '0') wish = 2;
+                        else wish = strtol(rawWish, nullptr, 10);
+                        //scanf("%d", &stepByStep);
+                        if (wish != 1 && wish != 2) {
+                            gotoxy(4, 8); printf("Неверно введён параметр\n");
+                            gotoxy(4, 9); printf("Пожалуйста, попробуйте ещё раз.\n");
+                            gotoxy(4, 10); printf("Нажмите Enter для продолжения");
+                            waitForKey(13);
+                            gotoxy(4, 8); PrintNullLine;
+                            gotoxy(4, 9); PrintNullLine;
+                            gotoxy(4, 10); PrintNullLine;
+                            gotoxy(4, 7); PrintNullLine;
+                        }
+                        //gotoxy(4, 6); PrintNullLine;
+                    } while(wish != 1 && wish != 2);
+                    gotoxy(4, 7); PrintNullLine;
+                    switch (wish) {
+                        case 1: {
+
+                            int source, destination;
+                            do {
+                                gotoxy(4, 8); printf("Введите номер вершины начала пути: ");
+                                char rawSource[3];
+                                fgets(rawSource, 3, stdin);
+                                fflush(stdin);
+                                source = strtol(rawSource, nullptr, 10);
+                                //scanf("%d", &stepByStep);
+                                if (source == 0 || source > pointsCount) {
+                                    gotoxy(4, 9); printf("Неверно введён номер вершины начала пути\n");
+                                    gotoxy(4, 10); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                    gotoxy(4, 11); printf("Нажмите Enter для продолжения");
+                                    waitForKey(13);
+                                    gotoxy(4, 9); PrintNullLine;
+                                    gotoxy(4, 10); PrintNullLine;
+                                    gotoxy(4, 11); PrintNullLine;
+                                    gotoxy(4, 8); PrintNullLine;
+                                }
+                                //gotoxy(4, 6); PrintNullLine;
+                            } while(source == 0 || source > pointsCount);
+                            do {
+                                gotoxy(4, 9); printf("Введите номер вершины конца пути: ");
+                                char rawDest[3];
+                                fgets(rawDest, 3, stdin);
+                                fflush(stdin);
+                                destination = strtol(rawDest, nullptr, 10);
+                                //scanf("%d", &stepByStep);
+                                if (destination == 0 || destination > pointsCount) {
+                                    gotoxy(4, 10); printf("Неверно введён номер вершины конца пути\n");
+                                    gotoxy(4, 11); printf("Пожалуйста, попробуйте ещё раз.\n");
+                                    gotoxy(4, 12); printf("Нажмите Enter для продолжения");
+                                    waitForKey(13);
+                                    gotoxy(4, 10); PrintNullLine;
+                                    gotoxy(4, 11); PrintNullLine;
+                                    gotoxy(4, 12); PrintNullLine;
+                                    gotoxy(4, 9); PrintNullLine;
+                                }
+                                //gotoxy(4, 6); PrintNullLine;
+                            } while(destination == 0 || destination > pointsCount);
+                            float pathLen = weightMatrix[source-1][destination-1];
+                            gotoxy(4, 10);
+                            if (pathLen == MAIN_DIAG_MARK) {
+                                printf("Вы выбрали элемент главной диагонали матрицы");
+                            }
+                            else if (pathLen == INFINITY) {
+                                printf("Пути из вершины %d в вершину %d не существует", source, destination);
+                            }
+                            else {
+                                printf("Длина кратчайшего пути из вершины %d в вершину %d равна %.2f", source, destination, pathLen);
+                            }
+
+                            gotoxy(4, 11); printf("Нажмите Enter для продолжения");
+                            waitForKey(13);
+                            break;
+                        }
+                    }
+
+                    //fclose(out);
                     for (int i = 0; i < pointsCount; i++) delete [] weightMatrix[i];
                     delete [] weightMatrix;
                 }
